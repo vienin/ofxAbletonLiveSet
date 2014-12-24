@@ -33,6 +33,10 @@ public:
 	
 public:
 	
+	float getGlobalTempo() const {
+		return globalTempo;
+	}
+	
 	void updateTempoMap(const map<BarTime, float>& data, float default_tempo)
 	{
 		events.clear();
@@ -56,6 +60,8 @@ public:
 			timemap = NULL;
 		}
 		
+		globalTempo = default_tempo;
+		
 		if (events.size() == 1)
 		{
 			timemap = new SimpleTimemap(default_tempo);
@@ -73,6 +79,8 @@ public:
 	}
 	
 private:
+	
+	float globalTempo = 120;
 	
 	struct Event
 	{

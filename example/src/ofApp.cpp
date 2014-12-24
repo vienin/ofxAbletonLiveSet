@@ -10,8 +10,17 @@ public:
 		ofxAbletonLiveSet::LiveSet LS;
 		
 		ofxAbletonLiveSet::Parser parser(LS);
-		parser.open("test.als");
+		if( !parser.open("test.als") ){
+			cout << "Could not parse the live set..." << endl;
+			ofExit();
+		}
 		
+		// print global variables
+		cout << "Global ALS variables" << endl;
+		cout << "Tempo: " << (LS.tempo.getGlobalTempo() ) << endl;
+		cout << "=========" << endl << endl;
+		
+		// track info
 		for (int i = 0; i < LS.miditracks.size(); i++)
 		{
 			const ofxAbletonLiveSet::MidiTrack &T = LS.miditracks.at(i);
@@ -38,6 +47,8 @@ public:
 			cout << "===" << endl << endl;
 		}
 		
+		
+		// show locators
 		for (int i = 0; i < LS.locators.size(); i++)
 		{
 			const ofxAbletonLiveSet::Locator &L = LS.locators.at(i);

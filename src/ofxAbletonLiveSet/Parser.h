@@ -20,12 +20,27 @@ public:
 		ifs.open(ofToDataPath(path).c_str());
 		if (!ifs) return false;
 		
-		Poco::InflatingInputStream inflater(ifs, Poco::InflatingStreamBuf::STREAM_GZIP);
-		if (!inflater) return false;
-		
 		pugi::xml_document doc;
-		if (!doc.load(inflater)) return false;
-
+		
+		// check extension ?
+		string extension = path.substr(path.find_last_of(".") + 1);
+		bool gzipped = false;
+		
+		if( extension == "als" || extension == "ALS") {
+			gzipped = true;
+			Poco::InflatingInputStream inflater(ifs, Poco::InflatingStreamBuf::STREAM_GZIP);
+			if (!inflater) return false;
+			
+			if (!doc.load(inflater)) return false;
+		}
+		else {
+			if(!doc.load(ifs)) return false;
+		}
+		
+		
+		
+		
+		// parse
 		parseTempo(doc);
 		parseMidiTrack(doc);
 		parseLocator(doc);
