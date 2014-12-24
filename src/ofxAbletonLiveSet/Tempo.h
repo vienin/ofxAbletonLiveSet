@@ -7,83 +7,25 @@ OFX_ALS_BEGIN_NAMESPACE
 typedef float BarTime;
 typedef float RealTime;
 
-class Tempo
-{
+class Tempo {
 public:
 	
 	Tempo() : timemap(NULL) {}
-	~Tempo()
-	{
-		if (timemap)
-		{
-			delete timemap;
-			timemap = NULL;
-		}
-	}
+	~Tempo();
 	
-	RealTime toRealTime(BarTime bar_time)
-	{
-		return timemap->toRealTime(bar_time);
-	}
+	RealTime toRealTime(BarTime bar_time);
 	
-	BarTime toBarTime(RealTime real_time)
-	{
-		return timemap->toBarTime(real_time);
-	}
+	BarTime toBarTime(RealTime real_time);
 	
-public:
+	float getGlobalTempo() const;
 	
-	float getGlobalTempo() const {
-		return globalTempo;
-	}
-	
-	void updateTempoMap(const map<BarTime, float>& data, float default_tempo)
-	{
-		events.clear();
-		
-		map<BarTime, float>::const_iterator it = data.begin();
-		while (it != data.end())
-		{
-			Event e;
-			e.time = it->first;
-			e.tempo = it->second;
-			
-			if (e.time < 0) e.time = 0;
-			events.push_back(e);
-			
-			it++;
-		}
-		
-		if (timemap)
-		{
-			delete timemap;
-			timemap = NULL;
-		}
-		
-		globalTempo = default_tempo;
-		
-		if (events.size() == 1)
-		{
-			timemap = new SimpleTimemap(default_tempo);
-		}
-		else
-		{
-			// timemap = new AutometedTimemap(events);
-			throw "tempo automation is not implemented yet";
-		}
-		
-		for (int i = 0; i < events.size(); i++)
-		{
-			events[i].time = toRealTime(events[i].time);
-		}
-	}
+	void updateTempoMap(const map<BarTime, float>& data, float default_tempo);
 	
 private:
 	
-	float globalTempo = 120;
+	float globalTempo = 120.0f;
 	
-	struct Event
-	{
+	struct Event {
 		BarTime time;
 		float tempo;
 	};
@@ -92,44 +34,36 @@ private:
 	
 	// ====
 	
-	struct Timemap
-	{
+	struct Timemap {
 		virtual ~Timemap() {}
 		virtual RealTime toRealTime(BarTime bar_time) = 0;
 		virtual BarTime toBarTime(RealTime real_time) = 0;
 	} *timemap;
 	
-	struct SimpleTimemap : public Timemap
-	{
+	struct SimpleTimemap : public Timemap {
 		float to_realtime_factor;
 		float to_bartime_factor;
 		
-		SimpleTimemap(float default_tempo)
-		{
+		SimpleTimemap(float default_tempo) {
 			to_realtime_factor = (60. / default_tempo);
 			to_bartime_factor = 1. / to_realtime_factor;
 		}
 		
-		RealTime toRealTime(BarTime bar_time)
-		{
+		RealTime toRealTime(BarTime bar_time) {
 			return to_realtime_factor * bar_time;
 		}
 		
-		BarTime toBarTime(RealTime real_time)
-		{
+		BarTime toBarTime(RealTime real_time) {
 			return to_bartime_factor * real_time;
 		}
 	};
 	
 #if 0
-	struct AutometedTimemap : public Timemap
-	{
-		AutometedTimemap(vector<Event>& e)
-		{
+	struct AutometedTimemap : public Timemap {
+		AutometedTimemap(vector<Event>& e) {
 			RealTime curtime = 0;
 			
-			for (int i = 0; i < e.size() - 1; i++)
-			{
+			for (int i = 0; i < e.size() - 1; i++){
 				Event &e0 = e[i];
 				Event &e1 = e[i + 1];
 				
@@ -146,13 +80,11 @@ private:
 			}
 		}
 		
-		RealTime toRealTime(BarTime bar_time)
-		{
+		RealTime toRealTime(BarTime bar_time){
 			return 0;
 		}
 		
-		BarTime toBarTime(RealTime real_time)
-		{
+		BarTime toBarTime(RealTime real_time){
 			return 0;
 		}
 	};
