@@ -120,6 +120,16 @@ void Parser::parse(Note& note, const pugi::xml_node &node, RealTime offset){
 	note.velocity = e.attribute("Velocity").as_float(0);
 }
 
+void Parser::parse(MidiClipLoop &loop, const pugi::xml_node &node, RealTime offset){
+	loop.enabled = node.child("LoopOn").attribute("Value").as_bool(false);
+	loop.relativeStart = LS.tempo.toRealTime( node.child("LoopStart").attribute("Value").as_float(-1) );
+	loop.start = loop.relativeStart + offset;
+	loop.end = LS.tempo.toRealTime( node.child("LoopEnd").attribute("Value").as_float(-1) ) + offset;
+	loop.duration = loop.end - loop.start;
+	LS.tempo.toRealTime( node.child("StartRelative").attribute("Value").as_float(-1) );
+	loop.outMarker = LS.tempo.toRealTime( node.child("OutMarker").attribute("Value").as_float(-1) );
+}
+
 void Parser::parse(MidiClip& MC, const pugi::xml_node &node, RealTime offset){
 	float start = node.child("CurrentStart").attribute("Value").as_float();
 	float end = node.child("CurrentEnd").attribute("Value").as_float();
@@ -132,7 +142,10 @@ void Parser::parse(MidiClip& MC, const pugi::xml_node &node, RealTime offset){
 	MC.name = node.child("Name").attribute("Value").value();
 	MC.annotation = node.child("Annotation").attribute("Value").value();
 	
-	{
+	// extract loop setting
+	parse(MC.loop, node.child("Loop"), MC.time);
+	
+	{ // extract midi notes
 		pugi::xpath_query q("Notes//KeyTracks//KeyTrack");
 		pugi::xpath_node_set nodes = q.evaluate_node_set(node);
 		
@@ -144,6 +157,7 @@ void Parser::parse(MidiClip& MC, const pugi::xml_node &node, RealTime offset){
 			
 			pugi::xml_object_range<pugi::xml_node_iterator> notes = key_tracks.child("Notes").children();
 			
+			// grab notes from clip
 			pugi::xml_node_iterator it = notes.begin();
 			while (it != notes.end()){
 				Note note;
@@ -156,10 +170,30 @@ void Parser::parse(MidiClip& MC, const pugi::xml_node &node, RealTime offset){
 			}
 		}
 		
+		// duplicate notes according to loop setting
+		if(MC.loop.enabled){
+			
+			// grab notes contained in loop section
+			vector<Note> loopNotes;
+			loopNotes.clear();
+			for(int i=0; i<MC.notes.size(); i++){
+				if(MC.notes[i].time >= MC.loop.start && MC.notes[i].time < MC.loop.end){
+					loopNotes.push_back(MC.notes[i]);
+				}
+			}
+			
+			for(Time t=MC.loop.duration; t < MC.duration; t+=MC.loop.duration){
+				for(int i=0; i<loopNotes.size(); i++){
+					if(loopNotes[i].time < MC.endtime) MC.notes.push_back(loopNotes[i] + t);
+				}
+			}
+			
+		}
+		
 		std:sort(MC.notes.begin(), MC.notes.end(), sort_by_time<Note>);
 	}
 
-	{
+	{ // extract envelopes
 		pugi::xpath_query q("Envelopes//ClipEnvelope");
 		pugi::xpath_node_set nodes = q.evaluate_node_set(node);
 		
@@ -185,6 +219,19 @@ void Parser::parse(MidiClip& MC, const pugi::xml_node &node, RealTime offset){
 				it++;
 			}
 		}
+	}
+	
+	{ // todo: extract warpmarkers
+		// /Tracks/MidiTrack/DeviceChain/ClipTimeable/ArrangerAutomation/Events/MidiClip/WarpMarkers/
+		// <WarpMarker SecTime="0.015625" BeatTime="0.03125"/>
+	}
+	
+	{ // todo: extract time signature
+		// /Tracks/MidiTrack/DeviceChain/ClipTimeable/ArrangerAutomation/Events/MidiClip/TimeSignature/TimeSignatures/RemoteableTimeSignature/
+	}
+	
+	{ // todo: extract floatEvents boolEvents from midiTrack plugins ?
+		// /Tracks/MidiTrack/DeviceChain/DeviceChain/Devices/PluginDevice/ParameterList
 	}
 }
 

@@ -33,9 +33,13 @@ private:
 	void parse(MidiTrack& MT, const pugi::xml_node &node, RealTime offset);
 	
 	void parse(Note& note, const pugi::xml_node &node, RealTime offset);
+	
+	void parse(MidiClipLoop& loop, const pugi::xml_node &node, RealTime offset);
 
 	void parse(MidiClip& MC, const pugi::xml_node &node, RealTime offset);
 
+	//
+	// todo: parse AudioTrack ? (not much insteresting information...)
 	//
 
 	void parseLocator(const pugi::xml_document& doc);
