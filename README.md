@@ -2,7 +2,15 @@ ofxAbletonLiveSet
 =================
 
 Ableton Live Set (.als) Project File parser.  
-Load an .als (or .xml) Ableton Live set into OpenFrameworks variables.
+Load an .als (or .xml) Ableton Live set into OpenFrameworks variables.  
+Useful for syncronising visuals with audio composed with Live.
+
+_Note: This plugin doesn't let you control Ableton via OSC._
+
+------
+##Usage
+Please refer to the example project.
+
 _________
 ##Extraction Features  
 
@@ -15,8 +23,8 @@ _________
 ##Not yet implemented
 - Some plugins carry floatEvents or boolEvents  
 - Some tracks can have WarpMarkers
-- Do you have other ideas ?  
 
+Do you have other ideas ?  
 Feel free to contribute! :D
 
 
