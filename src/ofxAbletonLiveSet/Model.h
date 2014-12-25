@@ -50,6 +50,9 @@ struct Locator {
 };
 
 struct LiveSet {
+	string name;
+	string userName;
+	string annotation;
 	Tempo tempo;
 	vector<Locator> locators;
 	vector<MidiTrack> miditracks;

@@ -25,6 +25,7 @@ bool Parser::open(const string& path){
 	}
 	
 	// parse it!
+	parseGeneralInfo(doc);
 	parseTempo(doc);
 	parseMidiTrack(doc);
 	parseLocator(doc);
@@ -32,6 +33,16 @@ bool Parser::open(const string& path){
 	return true;
 }
 
+void Parser::parseGeneralInfo(const pugi::xml_document &doc){
+	pugi::xpath_query q("//MasterTrack/Name");
+	pugi::xpath_node_set nodes = q.evaluate_node_set(doc);
+	
+	if (!nodes.empty()) {
+		LS.name = nodes[0].node().child("EffectiveName").attribute("Value").as_string();
+		LS.userName = nodes[0].node().child("UserName").attribute("Value").as_string();
+		LS.annotation = nodes[0].node().child("Annotation").attribute("Value").as_string();
+	}
+}
 
 void Parser::parseTempo(const pugi::xml_document& doc){
 	pugi::xpath_query q("//Tempo");

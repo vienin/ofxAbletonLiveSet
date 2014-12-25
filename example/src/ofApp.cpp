@@ -4,7 +4,7 @@ void ofApp::setup(){
 	ofxAbletonLiveSet::LiveSet LS;
 	ofxAbletonLiveSet::Parser parser(LS);
 	
-	if( !parser.open("test.als") ){
+	if( !parser.open("mappingvendome.xml") ){
 		cout << "Could not parse the live set..." << endl;
 		ofExit();
 	}

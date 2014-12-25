@@ -20,6 +20,8 @@ private:
 	LiveSet &LS;
 	int controller_target_offset;
 	
+	void parseGeneralInfo(const pugi::xml_document& doc);
+	
 	void parseTempo(const pugi::xml_document& doc);
 	
 	void parse(Tempo& tempo, const pugi::xml_node& node);
