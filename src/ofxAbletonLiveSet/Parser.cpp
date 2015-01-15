@@ -30,6 +30,8 @@ bool Parser::open(const string& path){
 	parseMidiTrack(doc);
 	parseLocator(doc);
 	
+	LS.loadedFile=path;
+	
 	return true;
 }
 
@@ -89,6 +91,23 @@ void Parser::parseMidiTrack(const pugi::xml_document& doc){
 void Parser::parse(MidiTrack& MT, const pugi::xml_node &node, RealTime offset) {
 	MT.name = node.child("Name").child("EffectiveName").attribute("Value").value();
 	MT.color = node.child("ColorIndex").attribute("Value").as_int();
+	
+	{
+		// time signatures are in clips and may change over time.
+		// here we just get the 1st one from the 1st clip and apply it to the whole track
+		// (to do)
+		pugi::xpath_query q("DeviceChain/MainSequencer/ClipTimeable/ArrangerAutomation/Events/MidiClip/TimeSignature/TimeSignatures/RemoteableTimeSignature");
+		pugi::xpath_node_set nodes = q.evaluate_node_set(node);
+		
+		if( nodes.size() > 0 ){
+			const pugi::xml_node& n = nodes[0].node();
+			
+			MT.timeSignature.numerator = n.child("Numerator").attribute("Value").as_int(0);
+			MT.timeSignature.denominator = n.child("Denominator").attribute("Value").as_int(0);
+			//MT.timeSignature.time = n.child("Time").attribute("Value").as_int(0);
+		}
+		
+	}
 	
 	{
 		pugi::xpath_query q(".//MidiControllers/ControllerTargets.0");

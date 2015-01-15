@@ -4,3 +4,4 @@
 #include "ofxAbletonLiveSet/Tempo.h"
 #include "ofxAbletonLiveSet/Model.h"
 #include "ofxAbletonLiveSet/Parser.h"
+#include "ofxAbletonLiveSet/EventHandler.h"

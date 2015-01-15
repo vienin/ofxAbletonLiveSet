@@ -15,6 +15,9 @@ public:
 	
 	bool open(const string& path);
 	
+	bool isLoaded() const;
+	string loadedLiveSet();
+	
 private:
 	
 	LiveSet &LS;

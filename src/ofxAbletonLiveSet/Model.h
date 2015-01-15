@@ -38,6 +38,13 @@ struct Automation {
 	map<float, float> events;
 };
 
+struct TimeSignature {
+	int numerator;
+	int denominator;
+	int pbm;
+	
+};
+
 struct MidiClip {
 	Time time;
 	Time endtime;
@@ -58,6 +65,7 @@ struct Track {
 };
 
 struct MidiTrack : public Track {
+	TimeSignature timeSignature;
 	vector<MidiClip> clips;
 };
 
@@ -71,9 +79,33 @@ struct LiveSet {
 	string name;
 	string userName;
 	string annotation;
+	string loadedFile;
+	bool isLoaded() const {
+		return (!loadedFile.empty());
+	}
 	Tempo tempo;
 	vector<Locator> locators;
 	vector<MidiTrack> miditracks;
+};
+
+struct LSNoteEvent {
+	LSNoteEvent(string _clipName, int _color, int _nthNote, int _nthNoteInClip, int _trackNb, Note _note) : clipName(_clipName), color(_color), nthNote(_nthNote), nthNoteInClip(_nthNoteInClip), trackNb(_trackNb), note(_note) {};
+	
+	string clipName;
+	int color;
+	int nthNote;
+	int nthNoteInClip;
+	int trackNb;
+	Note note;
+};
+
+struct LSMetronomEvent {
+	int barTime;
+	float realTime;
+	int bpm;
+	bool isAccent;
+	int trackNb;
+	TimeSignature timeSignature;
 };
 
 OFX_ALS_END_NAMESPACE
