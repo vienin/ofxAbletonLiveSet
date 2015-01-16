@@ -55,7 +55,7 @@ private:
 	void fireNextMetronomEvents( Poco::Timestamp::TimeDiff curTime );
 	
 	template <typename T>
-	static bool sort_by_time(const T& v0, const T& v1) { return v0.time < v1.time; }
+	static bool sort_by_time(const T& v0, const T& v1) { return v0.note.time < v1.note.time; }
 };
 
 OFX_ALS_END_NAMESPACE

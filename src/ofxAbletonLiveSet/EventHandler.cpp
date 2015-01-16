@@ -98,6 +98,8 @@ bool EventHandler::parseNoteEvents( LiveSet& LS ){
 			}
 		}
 	}
+	std:sort(LSNoteEvents.begin(), LSNoteEvents.end(), sort_by_time<LSNoteEvent>);
+	
 	return true;
 }
 
